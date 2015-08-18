@@ -39,10 +39,9 @@
   
   <script src="//js.arcgis.com/3.10"></script>
   <script>
-    var map;
-    var aecam;
-    var toc;
     
+    var previousLayer = 0;
+	var demographicHeaderLayers = [13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73];
     require(["esri/map", 
             "esri/layers/ArcGISDynamicMapServiceLayer", 
             "esri/dijit/Geocoder",
@@ -55,6 +54,10 @@
             "dojo/domReady!"], 
     function(Map, ArcGISDynamicMapServiceLayer, Geocoder, TOC, Navigation, parser, InitialExtent, SpatialReference, esriConfig) {
 
+		var map;
+    	var aecam;
+    	var toc;
+		
         esriConfig.defaults.io.corsDetection = false;
       
         initialExtent = new InitialExtent(172209.475904854, 3601359.1077277837, 985642.8725089643,  4064083.0555859907, new SpatialReference({
@@ -99,8 +102,44 @@
                 toc.on('load', function () {
                     if (console)
                      console.log('TOC loaded');
-                     
-                });
+          				toc.on('toc-node-checked', function (evt) {
+							//standby.show();
+							/*************************
+							Layer 12 - 79 are the demographic map layers
+							We don't want these layers activated at the same time
+							because the jumble on screen makes it unreadable.
+							The code below solves that.
+
+							Uses 2 variables 'demographicHeaderLayers' which is an
+							array containing the layer numbers of the demographic headers
+							and 'previousLayer' which holds the id of the layer the user 
+							has previously selected
+							*************************/
+							if (evt.serviceLayer.id > 12 && evt.serviceLayer.id < 79) {
+								if (evt.rootLayer && evt.serviceLayer && evt.rootLayer == aecam) {
+									if (dojo.indexOf(demographicHeaderLayers, evt.serviceLayer.id) !== -1)
+										evt.rootLayer.setVisibleLayers([6, 79]);
+									else {
+										if (evt.checked === true) {
+											if (previousLayer != evt.serviceLayer.id)
+											toc.findTOCNode(aecam, previousLayer).collapse();
+											evt.rootLayer.setVisibleLayers([evt.serviceLayer.id]);
+											previousLayer = evt.serviceLayer.id;
+										} else {
+											evt.rootLayer.setVisibleLayers([6, 79]);
+										}
+									}
+								}								 
+							}
+							if (console) {
+								console.log("TOCNodeChecked, rootLayer:"
+										+ (evt.rootLayer ? evt.rootLayer.id : 'NULL')
+										+ ", serviceLayer:" + (evt.serviceLayer ? evt.serviceLayer.id : 'NULL')
+										+ " Checked:" + evt.checked);
+							}							 
+							 //standby.hide();
+					 })
+				});
         });
 		
     });

@@ -4,8 +4,8 @@
   <title>5 Geocoder</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
+  <link rel="stylesheet" href="//js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="//js.arcgis.com/3.10/js/esri/css/esri.css">
   <style>
     html, body, #mapDiv{
       padding: 0;
@@ -13,7 +13,7 @@
       height: 100%;
     }
     #search {
-	      width: 450px;
+	    width: 450px;
         display: block;
         position: absolute;
         z-index: 20;
@@ -22,7 +22,7 @@
     }
   </style>
   
-  <script src="http://js.arcgis.com/3.10/"></script>
+  <script src="//js.arcgis.com/3.10/"></script>
   <script>
     var map;
     
@@ -35,7 +35,7 @@
             "esri/tasks/IdentifyParameters",
             "esri/symbols/SimpleMarkerSymbol",
             "esri/InfoTemplate",
-    		    "esri/graphic",
+    		"esri/graphic",
             "esri/Color",
             "dojo/_base/array",
             "dojo/on",
@@ -53,14 +53,14 @@
                 zoom: 8
             });
           
-            var AECAM = new ArcGISDynamicMapServiceLayer("http://argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
+            var AECAM = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
             	id: 'AECAM',
             	opacity: 0.1
             });     
     		
       		  map.addLayer(AECAM);
       		
-            identifyTask = new IdentifyTask("http://argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer");
+            identifyTask = new IdentifyTask("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer");
                     
             //initialize InfoTemplate
             infoTemplate = new InfoTemplate(null, "County : ${NAME10}<br/> FIPS :  ${STATEFP10}${COUNTYFP10}");

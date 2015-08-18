@@ -4,8 +4,8 @@
   <title>Create a Map</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
+  <link rel="stylesheet" href="//js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="//js.arcgis.com/3.10/js/esri/css/esri.css">
   <style>
     html, body, #mapDiv{
       padding: 0;
@@ -13,7 +13,7 @@
       height: 100%;
     }
   </style>
-  <script src="http://js.arcgis.com/3.10/"></script>
+  <script src="//js.arcgis.com/3.10/"></script>
   <script>
       var map;
       
@@ -39,7 +39,7 @@
             zoom: 8
         });
         
-        var aecam = new ArcGISDynamicMapServiceLayer("http://argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer",{
+        var aecam = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer",{
     	            id: 'aecam',
     	            outFields: ["*"],
     	            opacity: 0.8
@@ -49,7 +49,7 @@
     
 
         //initialize query task
-        queryTask = new QueryTask("http://argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer/79");
+        queryTask = new QueryTask("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer/79");
 
         //initialize query
         query = new Query();
