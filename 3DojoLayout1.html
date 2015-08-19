@@ -38,9 +38,9 @@
     function(Map, ArcGISDynamicMapServiceLayer,esriConfig, ContentPane, BorderContainer, parser ) {
 
       
-       esriConfig.defaults.io.corsDetection = false;
+       	esriConfig.defaults.io.corsDetection = false;
       
-      parser.parse();
+      	parser.parse();
       
         map = new Map("mapDiv", { 
             logo:false,
@@ -58,7 +58,7 @@
         	opacity: 0.5
         });     
 		
-		  map.addLayer(AECAM);
+		map.addLayer(AECAM);
       
         map.on('layer-add-result', function(lay){
           //alert(lay.layer.layerInfos[0].name + " layer added.");
@@ -71,10 +71,8 @@
 </head>
 <body class="claro">
   	<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true" id="borderContainer">
-    	<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'leading'" style="width: 100px;">Hi, I'm leading pane</div>
-    	<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'center'">
-			<div id="mapDiv" dojotype="dijit.layout.ContentPane" data-dojo-props="splitter:true, region:'center'"></div>
-		</div>
+    	<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'leading'" style="width: 350px;">Hi, I'm leading pane</div>
+    	<div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'center'"></div>
 	</div>
 </body>
 </html>
