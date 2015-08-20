@@ -1,0 +1,175 @@
+0<!DOCTYPE html>
+<html>
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">    
+	<title>AECAM</title>
+    <link rel="stylesheet" href="//js.arcgis.com/3.13/esri/css/esri.css">
+	<link rel="stylesheet" href="//js.arcgis.com/3.8/js/dojo/dijit/themes/claro/claro.css">
+    <style>
+		html, body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			overflow:hidden;
+			z-index:100;
+		}
+		.map{
+			width: 100%;
+			height: 100%;
+		}
+		#borderContainer {
+			width: 100%;
+			height: 100%;
+		}
+		.hoverClass {
+			cursor:move;
+		}
+    </style>
+	<!-- TOC widget -->
+	<script type="text/javascript">
+	   var djConfig = {
+		  paths: {
+			agsjs: location.pathname.replace(/\/[^/]+$/, "")+'/agsjs/build/agsjs'
+		  }
+		};
+    </script>
+	<!-- TOC widget -->
+    <script src="//js.arcgis.com/3.13/"></script>
+    <script type="text/javascript">
+      var map, legendDijit;
+	  var previousLayer = 0;
+	  var demographicHeaderLayers = [13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73];
+      require(["dojo/parser","esri/config", "esri/geometry/Extent","esri/SpatialReference","esri/map","esri/dijit/Popup","esri/layers/ArcGISDynamicMapServiceLayer",
+				"esri/symbols/SimpleFillSymbol","esri/symbols/SimpleLineSymbol","esri/symbols/SimpleMarkerSymbol","dojo/_base/Color","dojo/on", "dojo/mouse", "dojo/dom-class",
+				"dojo/dom-construct", "dijit/layout/ContentPane", "dijit/layout/BorderContainer","dijit/layout/AccordionContainer",
+				"agsjs/dijit/TOC","esri/dijit/Legend","dojo/_base/array","dojo/dnd/Moveable","dojo/dom","dojo/domReady!"], 
+		function(parser, esriConfig, Extent, SpatialReference, Map, Popup, ArcGISDynamicMapServiceLayer,
+				SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color, on, mouse, domClass,
+				domConstruct, ContentPane, BorderContainer, AccordionContainer, 
+				TOC, Legend, arrayUtils, Moveable, dom) {
+
+			parser.parse();
+			
+		    esriConfig.defaults.io.corsDetection = false;
+		  
+			initialExtent = new Extent(173394.2521390929, 3642298.04377402, 987818.4325118694, 4065555.1767404266, new SpatialReference({
+		         wkid: 26915
+		    }));
+			
+			var popup = new Popup({
+		         fillSymbol: new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25]))
+		    }, domConstruct.create("div"));
+			 
+		    map = new Map("map", {
+		        extent: initialExtent,
+		        logo: false,
+				slider: true,
+		        zoom: 8,
+				infoWindow: popup
+		    });
+
+		    aecam = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
+		         id: 'aecam',
+		         opacity: 0.8
+		     });
+			map.addLayers([aecam]);
+			
+			map.on("load", function () {
+				aecam.setVisibleLayers([6,79]);
+				toc = new TOC({
+		             map: map,
+		             layerInfos: [{
+		                 layer: aecam,
+		                 title: "Arkansas Early Chilhood Asset Map"
+		             }]
+		        }, 'tocDiv');
+				toc.startup();
+				toc.on('load', function () {
+					if (console)
+						console.log('TOC loaded');
+
+		             toc.on('toc-node-checked', function (evt) {
+						//standby.show();
+						/*************************
+						Layer 12 - 79 are the demographic map layers
+						We don't want these layers activated at the same time
+						because the jumble on screen makes it unreadable.
+						The code below solves that.
+						
+						Uses 2 variables 'demographicHeaderLayers' which is an
+						array containing the layer numbers of the demographic headers
+						and 'previousLayer' which holds the id of the layer the user 
+						has previously selected
+						*************************/
+						if (evt.serviceLayer.id > 12 && evt.serviceLayer.id < 79) {
+							if (evt.rootLayer && evt.serviceLayer && evt.rootLayer == aecam) {
+								if (dojo.indexOf(demographicHeaderLayers, evt.serviceLayer.id) !== -1)
+									evt.rootLayer.setVisibleLayers([6, 79]);
+								else {
+									if (evt.checked === true) {
+										if (previousLayer != evt.serviceLayer.id)
+										toc.findTOCNode(aecam, previousLayer).collapse();
+										evt.rootLayer.setVisibleLayers([evt.serviceLayer.id]);
+										previousLayer = evt.serviceLayer.id;
+									} else {
+										evt.rootLayer.setVisibleLayers([6, 79]);
+									}
+								}
+							}								 
+						}
+						if (console) {
+							console.log("TOCNodeChecked, rootLayer:"
+									+ (evt.rootLayer ? evt.rootLayer.id : 'NULL')
+									+ ", serviceLayer:" + (evt.serviceLayer ? evt.serviceLayer.id : 'NULL')
+									+ " Checked:" + evt.checked);
+						}
+						 legendDijit.refresh();
+						 //standby.hide();
+		             });
+					 
+					on(dom.byId("legendDiv"), mouse.enter, function(){
+						domClass.add("legendDiv", "hoverClass");
+					});
+					
+					on(dom.byId("legendDiv"), mouse.leave, function(){
+						domClass.remove("legendDiv", "hoverClass");
+					});
+				});	
+				map.on("layers-add-result", function (evt) {					
+					var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+					  return {layer:layer.layer, title:"Legend"};
+					});
+					if (layerInfo.length > 0) {
+					  legendDijit = new Legend({
+						map: map,
+						layerInfos: layerInfo
+					  }, "legendDiv");
+					  legendDijit.startup();
+					  var dnd = new Moveable(dom.byId("legendDiv"));
+					}
+				});
+			});	
+			
+			
+      });
+    </script>
+  </head>
+  <body class="claro">
+	<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true" id="borderContainer">
+		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'leading'" style="width: 375px;">
+			<div dojoType="dijit.layout.AccordionContainer" style="height: 300px;" id="accordion">
+				<div dojoType="dijit.layout.ContentPane" title="Table of Contents" selected="true" id="accToc">
+					<div id="tocDiv">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'center'">
+			<div id="map"></div>	
+		</div>
+		<span id="legendDiv" data-dojo-props="region:'center'" style="padding:10px;float:right;z-index:100;position:absolute;top:80px;right:120px;border-style: outset; border-width:1px; background-color:  #d3d3d3"></span>
+	</div>
+  </body>
+</html>

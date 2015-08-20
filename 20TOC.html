@@ -74,12 +74,9 @@
         });     
 		
 		map.addLayer(aecam);
-		
-		    
-       
-        
-        aecam.on("load", function () {
-                aecam.setVisibleLayers([79]);
+
+        map.on("load", function () {
+               aecam.setVisibleLayers([79]);
                toc = new TOC({
                     map: map,
                     layerInfos: [{
@@ -90,8 +87,7 @@
                 toc.startup();
                 toc.on('load', function () {
                     if (console)
-                     console.log('TOC loaded');
-                     
+                     console.log('TOC loaded');                     
                 });
         });
 		

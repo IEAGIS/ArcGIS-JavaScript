@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TOC</title>
+  <meta httpequiv="ContentType" content="text/html; charset=utf8">
+  <link rel="stylesheet" href="//js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="//js.arcgis.com/3.10/js/esri/css/esri.css">
+  <style>
+    html, body, #mapDiv{
+      padding: 0;
+      margin: 0;
+      height: 100%;
+    }
+    #search {
+	    width: 450px;
+        display: block;
+        position: absolute;
+        z-index: 20;
+        top: 40px;
+        left: 30px;
+    }
+    #tocDiv {
+        z-index: 40;
+        position: absolute;
+        top: 40px;
+        right: 30px;         
+    }
+	#legendDiv{
+		padding:10px;
+		float:right;
+		z-index:100;
+		position:absolute;
+		top:80px;
+		right:120px;
+		border-style: outset; 
+		border-width:1px; 
+		background-color:#d3d3d3
+	}
+    .hoverClass {
+		cursor:move;
+	}
+  </style>
+  <script>
+      var djConfig = {
+            isDebug: true,
+            parseOnLoad: false,
+            paths: {
+                //agsjs: location.pathname.replace(/\/[^/]+$/, "")+'/agsjs/build/agsjs'
+				agsjs: '//argis.ualr.edu/arcgis_proxy/agsjs/build/agsjs'
+            }
+        };
+  </script>
+  
+  <script src="//js.arcgis.com/3.10"></script>
+  <script>
+    var map;
+    var aecam;
+    var toc;
+    var legendDijit, previousLayer = 0;
+	var demographicHeaderLayers = [13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73];
+    require(["esri/map", 
+            "esri/layers/ArcGISDynamicMapServiceLayer", 
+            "agsjs/dijit/TOC",
+            "esri/toolbars/navigation",
+            "dojo/parser",
+            "esri/geometry/Extent", 
+            "esri/SpatialReference",
+            "esri/config",
+			"esri/dijit/Legend",
+			"dojo/_base/array",
+			"dojo/dnd/Moveable",
+			"dojo/dom",
+			"dojo/on",
+			"dojo/mouse",			 
+			"dojo/dom-class",
+            "dojo/domReady!"], 
+    function(Map, ArcGISDynamicMapServiceLayer, TOC, Navigation, parser, InitialExtent, SpatialReference, esriConfig, Legend, arrayUtils, Moveable, dom, on, mouse, domClass) {
+
+        esriConfig.defaults.io.corsDetection = false;
+      
+        initialExtent = new InitialExtent(172209.475904854, 3601359.1077277837, 985642.8725089643,  4064083.0555859907, new SpatialReference({
+                wkid: 26915  
+        }));
+        
+        map = new Map("mapDiv", { 
+            logo:false,
+            extent: initialExtent,
+            slider: false,
+            zoom: 8
+        });
+      
+      
+        aecam = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
+        	id: 'aecam',
+        	opacity: 0.8
+        });     
+		
+		map.addLayers([aecam]);
+		
+        map.on("load", function () {
+               aecam.setVisibleLayers([79]);
+               toc = new TOC({
+                    map: map,
+                    layerInfos: [{
+                     layer: aecam,
+                     title: "AECAM"
+                    }]
+                }, 'tocDiv');
+                toc.startup();
+				toc.on('load', function () {
+					if (console)
+						console.log('TOC loaded');
+
+		             toc.on('toc-node-checked', function (evt) {
+						//standby.show();
+						/*************************
+						Layer 12 - 79 are the demographic map layers
+						We don't want these layers activated at the same time
+						because the jumble on screen makes it unreadable.
+						The code below solves that.
+						
+						Uses 2 variables 'demographicHeaderLayers' which is an
+						array containing the layer numbers of the demographic headers
+						and 'previousLayer' which holds the id of the layer the user 
+						has previously selected
+						*************************/
+						if (evt.serviceLayer.id > 12 && evt.serviceLayer.id < 79) {
+							if (evt.rootLayer && evt.serviceLayer && evt.rootLayer == aecam) {
+								if (dojo.indexOf(demographicHeaderLayers, evt.serviceLayer.id) !== -1)
+									evt.rootLayer.setVisibleLayers([6, 79]);
+								else {
+									if (evt.checked === true) {
+										if (previousLayer != evt.serviceLayer.id)
+										toc.findTOCNode(aecam, previousLayer).collapse();
+										evt.rootLayer.setVisibleLayers([evt.serviceLayer.id]);
+										previousLayer = evt.serviceLayer.id;
+									} else {
+										evt.rootLayer.setVisibleLayers([6, 79]);
+									}
+								}
+							}								 
+						}
+						if (console) {
+							console.log("TOCNodeChecked, rootLayer:"
+									+ (evt.rootLayer ? evt.rootLayer.id : 'NULL')
+									+ ", serviceLayer:" + (evt.serviceLayer ? evt.serviceLayer.id : 'NULL')
+									+ " Checked:" + evt.checked);
+						}
+						 legendDijit.refresh();
+						 //standby.hide();
+		             });
+					 
+					on(dom.byId("legendDiv"), mouse.enter, function(){
+						domClass.add("legendDiv", "hoverClass");
+					});
+					
+					on(dom.byId("legendDiv"), mouse.leave, function(){
+						domClass.remove("legendDiv", "hoverClass");
+					});
+                });
+				map.on("layers-add-result", function (evt) {					
+					var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
+					  return {layer:layer.layer, title:"Legend"};
+					});
+					if (layerInfo.length > 0) {
+					  legendDijit = new Legend({
+						map: map,
+						layerInfos: layerInfo
+					  }, "legendDiv");
+					  legendDijit.startup();
+					  var dnd = new Moveable(dom.byId("legendDiv"));
+					}
+				});
+        });
+		
+    });
+
+    
+  </script>
+
+</head>
+<body class="claro">
+	<span id="legendDiv" data-dojo-props="region:'center'"></span>
+    <div id="mapDiv">
+        <div id="tocDiv"></div>		
+    </div>	
+</body>
+</html>
