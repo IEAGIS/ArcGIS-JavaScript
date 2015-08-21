@@ -32,7 +32,6 @@
       
         map = new Map("mapDiv", { 
             logo:false,
-            //extent: initialExtent,
             slider: true,
             basemap: "national-geographic",         //"satellite", "hybrid", "topo", "gray", "oceans", "osm", "national-geographic", "roads"
             center: [-92.541, 34.70],
@@ -43,7 +42,6 @@
         var AECAM = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
         	id: 'AECAM',
         	outFields: ["*"],
-        	//infoTemplate: infoTemplate,
         	opacity: 0.8
         });     
 		

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Geocoder</title>
+  <title>Geocoder Widget</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
   <link rel="stylesheet" href="//js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
@@ -58,7 +58,7 @@
             	opacity: 0.1
             });     
     		
-      		  map.addLayer(AECAM);
+      		//map.addLayer(AECAM);
       		
             identifyTask = new IdentifyTask("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer");
                     
@@ -110,9 +110,9 @@
                     var feature = result.feature;
                     var layerName = result.layerName;
                     
-                    var CountyTemplate = new InfoTemplate("${NAME10} County",
-                    "Address : "+ event.result.name+"<br/><br/> FIPS :  ${STATEFP10}${COUNTYFP10}");
-                    feature.setInfoTemplate(CountyTemplate);
+                    var template = new InfoTemplate("${NAME10} County",
+                    "Address : "+ event.result.name +"<br/><br/> FIPS :  ${STATEFP10}${COUNTYFP10}");
+                    feature.setInfoTemplate(template);
     
                     return feature;
                   });

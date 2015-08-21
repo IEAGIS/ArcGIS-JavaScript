@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Create a Map</title>
+  <title>Identify Task Multiple</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
   <link rel="stylesheet" href="//js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
@@ -72,7 +72,7 @@
             
         });
         map.addLayer(aecam);
-        map._layers.aecam.setVisibleLayers([0, 79]);
+        map._layers.aecam.setVisibleLayers([0, 2, 79]);
 
         identifyTask = new IdentifyTask("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer");
         
@@ -85,7 +85,7 @@
 
         identifyParams = new IdentifyParameters();
         identifyParams.tolerance = 10;
-        identifyParams.layerIds = [0,79];
+        identifyParams.layerIds = [0,2,79];
         identifyParams.returnGeometry = true;
         identifyParams.width = map.width;
         identifyParams.height = map.height;
@@ -104,20 +104,25 @@
               return arrayUtils.map(response, function (result) {
                 var feature = result.feature;
                 var layerName = result.layerName;
-
+				var template;
+				  
                   feature.attributes.layerName = layerName;
-                    if (layerName === 'Better Beginnings') {
-                      var BBTemplate = new InfoTemplate("Better Beginnings",
-                        "${ProviderNa} <br/> Facility Type: ${FacilityTy} <br/> Quality Level: ${QualityLev}");
-                      feature.setInfoTemplate(BBTemplate);
-                    }
-                    else if (layerName === 'County') {
-                      //console.log(feature.attributes.PARCELID);
-                      var CountyTemplate = new InfoTemplate("Arkansas",
+				  switch(layerName){
+					case 'Better Beginnings':
+						template = new InfoTemplate("Better Beginnings",
+						"${ProviderNa} <br/> Facility Type: ${FacilityTy} <br/> Quality Level: ${QualityLev}");
+						//feature.setInfoTemplate(BBTemplate);
+						break;
+					case 'County':
+						template = new InfoTemplate("Arkansas",
                         "County : ${NAME10}<br/> FIPS :  ${STATEFP10}${COUNTYFP10}");
-                      feature.setInfoTemplate(CountyTemplate);
-                    }
-                    return feature;
+                      	//feature.setInfoTemplate(CountyTemplate);
+						break;
+					default:
+						template = new InfoTemplate("Unknown",
+						"This feature is unknown.");
+				  }                    
+                  return feature.setInfoTemplate(template);
               });
             });
 
