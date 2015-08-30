@@ -27,9 +27,11 @@
     }
   </style>
   <script>
-      var djConfig = {
+      dojoConfig= {
+			has: {
+				"dojo-firebug": true
+			},
             isDebug: true,
-            parseOnLoad: false,
             paths: {
                 //agsjs: location.pathname.replace(/\/[^/]+$/, "")+'/agsjs/build/agsjs'
 				agsjs: '//argis.ualr.edu/arcgis_proxy/agsjs/build/agsjs'
@@ -81,7 +83,8 @@
                     map: map,
                     layerInfos: [{
                      layer: aecam,
-                     title: "AECAM"
+                     title: "AECAM",
+					 style: "inline"
                     }]
                 }, 'tocDiv');
                 toc.startup();

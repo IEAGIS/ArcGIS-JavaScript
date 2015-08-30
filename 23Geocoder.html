@@ -46,19 +46,18 @@
         
             map = new Map("mapDiv", { 
                 logo:false,
-                //extent: initialExtent,
                 slider: true,
                 basemap: "streets",         //"satellite", "hybrid", "topo", "gray", "oceans", "osm", "national-geographic", "streets"
                 center: [-92.541, 34.70],               //Arkansas
                 zoom: 8
             });
           
-            var AECAM = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
+           /* var AECAM = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer", {
             	id: 'AECAM',
             	opacity: 0.1
-            });     
+            });   
     		
-      		//map.addLayer(AECAM);
+      		map.addLayer(AECAM);*/
       		
             identifyTask = new IdentifyTask("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer");
                     
@@ -95,8 +94,8 @@
             
             function executeIdentifyTask (event) {
               map.graphics.clear();
-        			var graphic = new Graphic(event.result.feature.geometry, pointSymbol);
-        			map.graphics.add(graphic); 
+        	  var graphic = new Graphic(event.result.feature.geometry, pointSymbol);
+        	  map.graphics.add(graphic); 
     
               identifyParams.geometry = event.result.feature.geometry;
               identifyParams.mapExtent = map.extent;
@@ -108,7 +107,6 @@
                   // Let's return an array of features.
                   return arrayUtils.map(response, function (result) {
                     var feature = result.feature;
-                    var layerName = result.layerName;
                     
                     var template = new InfoTemplate("${NAME10} County",
                     "Address : "+ event.result.name +"<br/><br/> FIPS :  ${STATEFP10}${COUNTYFP10}");

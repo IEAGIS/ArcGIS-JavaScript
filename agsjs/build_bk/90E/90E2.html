@@ -1,4 +1,4 @@
-0<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -43,11 +43,11 @@
 	  var demographicHeaderLayers = [13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73];
       require(["dojo/parser","esri/config", "esri/geometry/Extent","esri/SpatialReference","esri/map","esri/dijit/Popup","esri/layers/ArcGISDynamicMapServiceLayer",
 				"esri/symbols/SimpleFillSymbol","esri/symbols/SimpleLineSymbol","esri/symbols/SimpleMarkerSymbol","dojo/_base/Color","dojo/on", "dojo/mouse", "dojo/dom-class",
-				"dojo/dom-construct", "dijit/layout/ContentPane", "dijit/layout/BorderContainer","dijit/layout/AccordionContainer",
+				"dojo/dom-construct", "dijit/layout/ContentPane", "dijit/layout/BorderContainer","dijit/layout/AccordionContainer","dojox/widget/Standby",
 				"agsjs/dijit/TOC","esri/dijit/Legend","dojo/_base/array","dojo/dnd/Moveable","dojo/dom","dojo/domReady!"], 
 		function(parser, esriConfig, Extent, SpatialReference, Map, Popup, ArcGISDynamicMapServiceLayer,
 				SimpleFillSymbol, SimpleLineSymbol, SimpleMarkerSymbol, Color, on, mouse, domClass,
-				domConstruct, ContentPane, BorderContainer, AccordionContainer, 
+				domConstruct, ContentPane, BorderContainer, AccordionContainer, Standby,
 				TOC, Legend, arrayUtils, Moveable, dom) {
 
 			parser.parse();
@@ -75,7 +75,13 @@
 		         opacity: 0.8
 		     });
 			map.addLayers([aecam]);
-			
+			var standby = new Standby({
+				id : "StandyBy1",
+				target : "content",
+			});
+			document.body.appendChild(standby.domNode);
+			standby.startup();
+		  
 			map.on("load", function () {
 				aecam.setVisibleLayers([6,79]);
 				toc = new TOC({
@@ -89,9 +95,8 @@
 				toc.on('load', function () {
 					if (console)
 						console.log('TOC loaded');
-
-		             toc.on('toc-node-checked', function (evt) {
-						//standby.show();
+					 toc.on('toc-node-checked', function (evt) {
+						standby.show();
 						/*************************
 						Layer 12 - 79 are the demographic map layers
 						We don't want these layers activated at the same time
@@ -126,7 +131,7 @@
 									+ " Checked:" + evt.checked);
 						}
 						 legendDijit.refresh();
-						 //standby.hide();
+						 standby.hide();
 		             });
 					 
 					on(dom.byId("legendDiv"), mouse.enter, function(){
@@ -153,10 +158,10 @@
 			});	
 			
 			
-      });
+    });
     </script>
   </head>
-  <body class="claro">
+  <body class="claro" id="content">
 	<div data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'sidebar', gutters:true, liveSplitters:true" id="borderContainer">
 		<div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="splitter:true, region:'leading'" style="width: 375px;">
 			<div dojoType="dijit.layout.AccordionContainer" style="height: 300px;" id="accordion">

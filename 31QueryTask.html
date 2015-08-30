@@ -52,10 +52,14 @@
           slider: false
         });
         
-		 var featureLayer = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer",{
-    	            id: 'featureLayer',
-    	            outFields: ["*"]
+		 /*var aecam = new ArcGISDynamicMapServiceLayer("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer",{
+    	      id: 'aecam',
+    	      outFields: ["*"],
+			  opacity: 0.8
 		 });
+		  map.addLayer(aecam);
+          aecam.setVisibleLayers([0]);*/
+		  
         // selection symbol used to draw the selected points within the buffer polygon
         var symbol = new SimpleMarkerSymbol(
           SimpleMarkerSymbol.STYLE_CIRCLE, 
@@ -86,7 +90,7 @@
             geodesic: true,
             radius: 3,
             radiusUnit: "esriMiles"
-          });
+          });		  
 			
 			//initialize query task
           queryTask = new QueryTask("//argis.ualr.edu/arcgis/rest/services/AECAM_MAP/MapServer/0");
@@ -98,7 +102,7 @@
           var query = new Query();
 		  query.returnGeometry = true;
           query.geometry = circle.getExtent();
-
+			
 		  var deferred = queryTask.execute(query);
   
           deferred.addCallback(function(response) {
